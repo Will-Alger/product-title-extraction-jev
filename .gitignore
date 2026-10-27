@@ -1,0 +1,18 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Raw downloads and derived Amazon text stay local.
+data/raw/
+data/processed/
+research/.cache/
+# Old per-title outputs from earlier runs (contain titles).
+research/results/runs/
+
+# arXiv's default license doesn't allow redistribution; link to https://arxiv.org/abs/1608.04670 instead.
+*.pdf
+
+# Local notes; the README carries the results.
+research/results/*.md

@@ -1,0 +1,19 @@
+{
+ "annotators": 1,
+ "items": 200,
+ "how_labeled": {
+  "confirmed": 184,
+  "edited": 5,
+  "blind": 11
+ },
+ "n_cant_tell": 5,
+ "n_judged": 195,
+ "catalog_error_rate": 0.010256410256410256,
+ "catalog_error_wilson95": [
+  0.0028171396519349606,
+  0.0366192760679144
+ ],
+ "catalog_errors_by_kind": {
+  "catalog brand, human none": 2
+ }
+}

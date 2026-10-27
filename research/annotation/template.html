@@ -1,0 +1,283 @@
+<title>Title Labeling Bench</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one centered work column — the title being labeled is the page; controls sit under it, guidelines fold away. */
+:root {
+  --paper: #f4f5f2;
+  --surface: #ffffff;
+  --ink: #1c2025;
+  --muted: #5d6670;
+  --line: #d6dad3;
+  --brand: #f2b630;      /* hi-vis amber: brand span */
+  --brand-ink: #3a2a00;
+  --volt: #2f6fb3;       /* steel blue: voltage span */
+  --volt-ink: #ffffff;
+  --ok: #2e7d4f;
+  --warn: #a2541b;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15181b; --surface: #1e2226; --ink: #e8eae6; --muted: #9aa3ab; --line: #333a40;
+    --brand: #e0a72a; --brand-ink: #1f1600; --volt: #5b9be0; --volt-ink: #0b1622; --ok: #5cbf85; --warn: #e39257;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15181b; --surface: #1e2226; --ink: #e8eae6; --muted: #9aa3ab; --line: #333a40;
+  --brand: #e0a72a; --brand-ink: #1f1600; --volt: #5b9be0; --volt-ink: #0b1622; --ok: #5cbf85; --warn: #e39257;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink); font: 16px/1.5 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 48px;
+}
+main { max-width: 860px; margin: 0 auto; display: grid; gap: 18px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+h1 { font-size: 1.25rem; margin: 0; text-wrap: balance; }
+.status { font-family: var(--mono); font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--ok); transition: width .2s; }
+.notice { border: 1px solid var(--warn); color: var(--warn); border-radius: 6px; padding: 10px 14px; font-size: 0.95rem; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: grid; gap: 16px; }
+.itemid { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
+.tokens { display: flex; flex-wrap: wrap; gap: 6px; font-family: var(--mono); font-size: 1.05rem; }
+.tok {
+  border: 1px solid var(--line); background: transparent; color: var(--ink); font: inherit;
+  padding: 4px 7px; border-radius: 5px; cursor: pointer; min-width: 0; overflow-wrap: anywhere;
+}
+.tok:hover { border-color: var(--muted); }
+.tok:focus-visible, button:focus-visible { outline: 2px solid var(--volt); outline-offset: 2px; }
+.tok.b { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+.tok.v { background: var(--volt); color: var(--volt-ink); border-color: var(--volt); }
+.tok.b.v { background: linear-gradient(135deg, var(--brand) 50%, var(--volt) 50%); }
+.modes { display: flex; gap: 8px; flex-wrap: wrap; }
+.mode { font: inherit; border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 999px; padding: 4px 14px; cursor: pointer; }
+.mode[aria-pressed="true"].brand { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+.mode[aria-pressed="true"].volt { background: var(--volt); color: var(--volt-ink); border-color: var(--volt); }
+.answers { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; font-size: 0.95rem; }
+.answers dt { color: var(--muted); }
+.answers dd { margin: 0; font-family: var(--mono); min-width: 0; overflow-wrap: anywhere; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button.act { font: inherit; padding: 7px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); cursor: pointer; }
+button.act[aria-pressed="true"] { border-color: var(--ink); font-weight: 700; }
+button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); font-weight: 700; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+.spacer { flex: 1; }
+kbd { font-family: var(--mono); font-size: 0.75rem; border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; color: var(--muted); }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+details ul { padding-left: 1.2em; margin: 10px 0 4px; display: grid; gap: 6px; max-width: 68ch; }
+.saved { color: var(--ok); font-size: 0.9rem; min-height: 1.4em; }
+@media (prefers-reduced-motion: reduce) { .bar > i { transition: none; } }
+</style>
+
+<main>
+  <header>
+    <h1>Title Labeling Bench</h1>
+    <span class="status" id="status">Loading…</span>
+  </header>
+  <div class="bar" aria-hidden="true"><i id="progress"></i></div>
+  <div class="notice" id="notice" hidden></div>
+
+  <details id="guide">
+    <summary>Labeling guidelines</summary>
+    <ul>
+      <li><b>Brand</b>: select the words that name the company or brand that makes and sells <i>this</i> product, exactly as written in the title. Use only the title; don't look products up.</li>
+      <li>Leave out product lines, model names and numbers: <code>DEWALT</code>, not <code>DEWALT 20V MAX</code>. Keep a company suffix only if it is written as part of the name (<code>IDEAL INDUSTRIES INC.</code>).</li>
+      <li>A brand named only for compatibility ("for Delta drill press", "fits RIDGID") is not this product's brand. If no other brand is named, choose <b>No brand of its own</b>.</li>
+      <li>If two readings are both plausible, choose <b>Can't tell</b> instead of guessing.</li>
+      <li>Each title opens with the <b>catalog's brand</b> highlighted. It comes from the seller's listing, not from any model being tested, and it is wrong a few percent of the time. If it's right, press <b>Correct</b>. If not, fix it.</li>
+      <li>To fix: click a highlighted word at either end to shrink the selection, click the word next to it to extend, or click any other word to start over. Keys: <kbd>Enter</kbd> save and next, <kbd>N</kbd> no brand, <kbd>U</kbd> can't tell, <kbd>R</kbd> reset to the catalog's brand, <kbd>←</kbd>/<kbd>→</kbd> move.</li>
+    </ul>
+  </details>
+
+  <section class="card" aria-live="polite">
+    <div class="row"><span class="itemid" id="itemid"></span><span class="spacer"></span><span class="itemid" id="pos"></span></div>
+    <div class="modes" role="group" aria-label="What you are selecting" hidden>
+      <button class="mode brand" id="modeBrand" aria-pressed="true">Brand</button>
+      <button class="mode volt" id="modeVolt" aria-pressed="false">Voltage</button>
+    </div>
+    <div class="tokens" id="tokens"></div>
+    <dl class="answers">
+      <dt>Brand</dt><dd id="ansBrand">—</dd>
+      <dt hidden>Voltage</dt><dd id="ansVolt" hidden>none stated</dd>
+      <dt>Catalog said</dt><dd id="ansSuggest">—</dd>
+    </dl>
+    <div class="row">
+      <button class="act" id="noBrand">No brand of its own</button>
+      <button class="act" id="unsure">Can't tell</button>
+      <button class="act" id="clearVolt" hidden>Clear voltage</button>
+      <button class="act" id="reset">Reset to catalog</button>
+    </div>
+    <div class="row">
+      <button class="act" id="prev">← Back</button>
+      <button class="act" id="skipTo">First unlabeled</button>
+      <span class="spacer"></span>
+      <span class="saved" id="saved"></span>
+      <button class="act primary" id="save">Save and next</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const ITEMS = /*ITEMS*/[];
+const $ = (id) => document.getElementById(id);
+const state = { order: [], idx: 0, labels: {}, db: null, uid: null, mode: "brand", draft: null };
+
+function hash(str) { let h = 2166136261; for (const c of str) { h ^= c.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+function shuffled(items, seed) {
+  let s = seed || 1; const rnd = () => ((s = Math.imul(s ^ (s >>> 15), 2246822507) + 0x9e3779b9 >>> 0) / 4294967296);
+  const a = items.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a;
+}
+
+function current() { return state.order[state.idx]; }
+function emptyDraft() {
+  const sg = current().suggest;
+  return sg ? { brandStatus: "span", brand: sg.slice(), voltage: null } : { brandStatus: "none", brand: null, voltage: null };
+}
+function matchesSuggestion(d, it) {
+  if (!it.suggest) return d.brandStatus === "none";
+  return d.brandStatus === "span" && d.brand && d.brand[0] === it.suggest[0] && d.brand[1] === it.suggest[1];
+}
+function loadDraft() {
+  const it = current(); const saved = state.labels[it.id];
+  state.draft = saved ? JSON.parse(JSON.stringify({ brandStatus: saved.brandStatus, brand: saved.brand, voltage: saved.voltage })) : emptyDraft();
+}
+function spanText(it, sp) { return sp ? it.tokens.slice(sp[0], sp[1]).join(" ") : null; }
+
+function clickToken(i) {
+  const key = state.mode === "brand" ? "brand" : "voltage";
+  const sp = state.draft[key];
+  let next;
+  if (!sp) next = [i, i + 1];
+  else if (i === sp[0] - 1) next = [i, sp[1]];
+  else if (i === sp[1]) next = [sp[0], i + 1];
+  else if (sp[1] - sp[0] > 1 && i === sp[0]) next = [sp[0] + 1, sp[1]];
+  else if (sp[1] - sp[0] > 1 && i === sp[1] - 1) next = [sp[0], sp[1] - 1];
+  else if (sp[1] - sp[0] === 1 && i === sp[0]) next = null;
+  else next = [i, i + 1];
+  state.draft[key] = next;
+  if (key === "brand") state.draft.brandStatus = next ? "span" : null;
+  render();
+}
+
+function render() {
+  const it = current(); if (!it) return;
+  const d = state.draft;
+  $("itemid").textContent = it.id;
+  $("pos").textContent = `${state.idx + 1} of ${state.order.length}`;
+  const box = $("tokens"); box.textContent = "";
+  it.tokens.forEach((t, i) => {
+    const b = document.createElement("button");
+    b.className = "tok"; b.type = "button"; b.textContent = t;
+    if (d.brand && i >= d.brand[0] && i < d.brand[1]) b.classList.add("b");
+    if (d.voltage && i >= d.voltage[0] && i < d.voltage[1]) b.classList.add("v");
+    b.addEventListener("click", () => clickToken(i));
+    box.appendChild(b);
+  });
+  $("ansBrand").textContent = d.brandStatus === "span" ? spanText(it, d.brand) : d.brandStatus === "none" ? "no brand of its own" : d.brandStatus === "unsure" ? "can't tell" : "—";
+  $("ansVolt").textContent = d.voltage ? spanText(it, d.voltage) : "none stated";
+  $("ansSuggest").textContent = it.suggest ? spanText(it, it.suggest) : "no brand";
+  $("save").textContent = matchesSuggestion(d, it) ? "Correct, next" : "Save fix, next";
+  $("noBrand").setAttribute("aria-pressed", String(d.brandStatus === "none"));
+  $("unsure").setAttribute("aria-pressed", String(d.brandStatus === "unsure"));
+  $("modeBrand").setAttribute("aria-pressed", String(state.mode === "brand"));
+  $("modeVolt").setAttribute("aria-pressed", String(state.mode === "voltage"));
+  $("save").disabled = !d.brandStatus || !state.db;
+  $("prev").disabled = state.idx === 0;
+  const done = ITEMS.filter((x) => state.labels[x.id]).length;
+  $("status").textContent = `${done} / ${ITEMS.length} labeled`;
+  $("progress").style.width = `${(100 * done) / ITEMS.length}%`;
+}
+
+function setBrandStatus(s) { state.draft.brandStatus = state.draft.brandStatus === s ? null : s; if (state.draft.brandStatus !== "span") state.draft.brand = null; render(); }
+function go(i) { state.idx = Math.max(0, Math.min(state.order.length - 1, i)); loadDraft(); $("saved").textContent = ""; render(); }
+function firstUnlabeled() { const i = state.order.findIndex((it) => !state.labels[it.id]); return i < 0 ? state.idx : i; }
+
+let saving = false;
+async function save() {
+  const it = current(); const d = state.draft;
+  if (!d.brandStatus || !state.db || saving) return;
+  const body = {
+    item: it.id, brandStatus: d.brandStatus,
+    // How this label was made: accepted the catalog suggestion, or changed it.
+    method: matchesSuggestion(d, it) ? "confirmed" : "edited",
+    brand: d.brandStatus === "span" ? { start: d.brand[0], end: d.brand[1], text: spanText(it, d.brand) } : null,
+    voltage: d.voltage ? { start: d.voltage[0], end: d.voltage[1], text: spanText(it, d.voltage) } : null,
+    savedAt: new Date().toISOString(),
+  };
+  saving = true; $("saved").textContent = "Saving…";
+  try {
+    await state.db.collection(`labels/${state.uid}/items`).doc(it.id).set(body);
+    state.labels[it.id] = { brandStatus: body.brandStatus, brand: d.brand, voltage: d.voltage };
+    // One summary doc per annotator, so their labels can be found and counted.
+    await state.db.doc(`labels/${state.uid}`).set({ labeled: ITEMS.filter((x) => state.labels[x.id]).length, lastSavedAt: body.savedAt });
+    $("saved").textContent = "Saved";
+    const nextIdx = state.order.findIndex((x, i) => i > state.idx && !state.labels[x.id]);
+    go(nextIdx >= 0 ? nextIdx : Math.min(state.idx + 1, state.order.length - 1));
+  } catch (e) {
+    $("saved").textContent = "";
+    showNotice(e && e.code === "invalid_argument"
+      ? "You don't have permission to save labels on this page. Ask the owner to share it with you as a Contributor."
+      : `Couldn't save this label (${(e && e.code) || "error"}). Check your connection and press Save again.`);
+  } finally { saving = false; }
+}
+
+function showNotice(msg) { const n = $("notice"); n.textContent = msg; n.hidden = !msg; }
+
+$("modeBrand").addEventListener("click", () => { state.mode = "brand"; render(); });
+$("modeVolt").addEventListener("click", () => { state.mode = "voltage"; render(); });
+$("noBrand").addEventListener("click", () => setBrandStatus("none"));
+$("unsure").addEventListener("click", () => setBrandStatus("unsure"));
+$("clearVolt").addEventListener("click", () => { state.draft.voltage = null; render(); });
+$("reset").addEventListener("click", () => { state.draft = emptyDraft(); render(); });
+$("prev").addEventListener("click", () => go(state.idx - 1));
+$("skipTo").addEventListener("click", () => go(firstUnlabeled()));
+$("save").addEventListener("click", save);
+document.addEventListener("keydown", (e) => {
+  if (e.target.closest && e.target.closest("summary")) return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key.toLowerCase();
+  if (k === "r") { state.draft = emptyDraft(); render(); }
+  else if (k === "n") setBrandStatus("none");
+  else if (k === "u") setBrandStatus("unsure");
+  else if (e.key === "Enter" && !(e.target.classList && e.target.classList.contains("tok"))) { e.preventDefault(); save(); }
+  else if (e.key === "ArrowLeft") go(state.idx - 1);
+  else if (e.key === "ArrowRight") go(state.idx + 1);
+});
+
+// First frame: items in a fixed order, read-only until the store answers.
+state.order = ITEMS.slice(); go(0);
+
+(async () => {
+  const [db, user] = await Promise.all([window.claude?.use("db"), window.claude?.use("user")]);
+  const uid = user ? await user.id() : null;
+  if (!db || !uid) {
+    showNotice("Labels can't be saved in this view. Open the page on claude.ai while signed in, with Contributor access.");
+    $("status").textContent = `${ITEMS.length} titles · view only`;
+    return;
+  }
+  state.db = db; state.uid = uid;
+  state.order = shuffled(ITEMS, hash(uid));
+  try {
+    const snap = await db.collection(`labels/${uid}/items`).get();
+    for (const doc of snap.docs) {
+      const v = doc.data();
+      state.labels[doc.id] = {
+        brandStatus: v.brandStatus,
+        brand: v.brand ? [v.brand.start, v.brand.end] : null,
+        voltage: v.voltage ? [v.voltage.start, v.voltage.end] : null,
+      };
+    }
+  } catch (e) {
+    showNotice(`Couldn't load your earlier labels (${(e && e.code) || "error"}). New labels will still save.`);
+  }
+  go(firstUnlabeled());
+})();
+</script>

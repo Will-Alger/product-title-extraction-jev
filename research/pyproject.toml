@@ -1,0 +1,27 @@
+[project]
+name = "pte-research"
+version = "0.1.0"
+description = "Brand extraction from product titles: the paper's CRF, Jev and Claude."
+requires-python = ">=3.12"
+dependencies = [
+    "sklearn-crfsuite>=0.5.0",
+    "scikit-learn>=1.5",
+    "numpy>=2.0",
+    "httpx>=0.27",
+    "python-dotenv>=1.0",
+    "typesafe-sdk>=0.7.5",
+    "anthropic>=0.70",
+]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pte"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

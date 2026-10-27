@@ -1,0 +1,17 @@
+{
+ "jev": {
+  "n": 200,
+  "p50_ms": 87.74224999069702,
+  "p95_ms": 145.39487499714596,
+  "mean_ms": 94.61450599985255,
+  "measured_at": "2026-10-24 00:31"
+ },
+ "claude": {
+  "n": 200,
+  "p50_ms": 1429.1816000040853,
+  "p95_ms": 2328.259865001018,
+  "mean_ms": 1651.6944859999785,
+  "measured_at": "2026-10-24 00:36"
+ },
+ "note": "sequential, uncached, one Windows laptop on a residential network"
+}

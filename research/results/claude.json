@@ -1,0 +1,7 @@
+{
+ "f1": 0.9471216462620474,
+ "cost_per_1k_usd": 2.368598,
+ "n_test": 2000,
+ "model": "claude-opus-5-5",
+ "effort": "low"
+}
