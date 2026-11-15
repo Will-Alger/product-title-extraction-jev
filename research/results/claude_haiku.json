@@ -1,0 +1,7 @@
+{
+ "f1": 0.9296364111953963,
+ "cost_per_1k_usd": 0.09307320000000001,
+ "n_test": 2000,
+ "model": "claude-haiku-5-5",
+ "effort": "high"
+}

@@ -3,7 +3,7 @@
 - Brand not the first word of the title, where position doesn't give the answer away.
 - Brands that never appear in the 218k-title CRF's training titles.
 
-Run scripts/run_crf.py, run_jev.py and run_claude.py first. Writes research/results/slices.json.
+Run scripts/run_crf.py, run_jev.py and run_claude.py (with and without --haiku) first. Writes research/results/slices.json.
 """
 
 from pte.data import Prediction, load
@@ -16,7 +16,7 @@ from pte.text import brand_key, span_text
 def main() -> None:
     test = test_set()
     seen = {brand_key(e.value) for e in load(PROCESSED / "brand_train.jsonl") if e.value}
-    methods = {name: load_predictions(name, test) for name in ("crf", "crf_61k", "jev", "claude")}
+    methods = {name: load_predictions(name, test) for name in ("crf", "crf_61k", "jev", "claude", "claude_haiku")}
     methods["first_word"] = [Prediction(span_text(ex.title, ex.tokens, (0, 1)) if ex.tokens else None)
                              for ex in test]
 
@@ -35,9 +35,9 @@ def main() -> None:
         for m, preds in methods.items():
             row[m] = f1(golds, [preds[i] for i in idx])
         # Uncorrected 95% intervals, for scale only: these splits were planned as descriptive, not as tests.
-        for crf in ("crf", "crf_61k"):
-            diff, lo, hi = paired_bootstrap(golds, [methods["jev"][i] for i in idx], [methods[crf][i] for i in idx])
-            row[f"jev_minus_{crf}"] = {"diff": diff, "ci95": [lo, hi]}
+        for other in ("crf", "crf_61k", "claude_haiku"):
+            diff, lo, hi = paired_bootstrap(golds, [methods["jev"][i] for i in idx], [methods[other][i] for i in idx])
+            row[f"jev_minus_{other}"] = {"diff": diff, "ci95": [lo, hi]}
         result[name] = row
     write_result("slices", result)
 

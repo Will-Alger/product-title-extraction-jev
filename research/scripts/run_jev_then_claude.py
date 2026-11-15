@@ -5,8 +5,13 @@ cutoff, or when Jev says "no brand". The cutoff is the lowest one that keeps F1 
 alone. To avoid grading the cutoff on the titles it was picked on, the titles are split in half at random: the
 cutoff is picked on one half and scored on the other. This is repeated N_SPLITS times and the scores averaged.
 
-Run scripts/run_jev.py and scripts/run_claude.py first. Writes research/results/jev_then_claude.json.
+With --haiku, the titles go to Claude Haiku instead of Opus.
+
+Run scripts/run_jev.py and scripts/run_claude.py (with --haiku for that version) first. Writes
+research/results/jev_then_claude.json (or jev_then_claude_haiku.json).
 """
+
+import sys
 
 import numpy as np
 
@@ -19,8 +24,9 @@ NO_BRAND = -1.0  # confidence given to Jev's "no brand" answers, below any real 
 
 
 def main() -> None:
+    suffix = "_haiku" if "--haiku" in sys.argv[1:] else ""
     test = test_set()
-    jev, claude = load_predictions("jev", test), load_predictions("claude", test)
+    jev, claude = load_predictions("jev", test), load_predictions("claude" + suffix, test)
     conf = np.array([p.confidence if p.value is not None else NO_BRAND for p in jev])
     # Candidate cutoffs from lowest to highest: "send nothing", then each distinct Jev confidence.
     cutoffs = np.r_[-np.inf, np.unique(conf)]
@@ -46,7 +52,7 @@ def main() -> None:
         scores.append(combined(score_on, pick_cutoff(pick_on)))
     f1s, shares, costs = np.array(scores).T
 
-    write_result("jev_then_claude", {
+    write_result("jev_then_claude" + suffix, {
         "f1": float(f1s.mean()),
         "f1_middle_95pct_of_splits": [float(x) for x in np.percentile(f1s, [2.5, 97.5])],
         "share_sent_to_claude": float(shares.mean()),
