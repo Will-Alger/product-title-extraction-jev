@@ -35,12 +35,12 @@ I also tried two combinations, designed after the main comparison. Jev answers e
 
 | Method | F1, all titles | Cost per 1,000 titles |
 |---|---|---|
-| CRF, 218k titles | 92.2 | runs locally |
-| Jev | 91.9 | $0.05 |
-| Jev, then Haiku | 92.7 | $0.05 |
-| Claude Haiku | 93.0 | $0.09 |
-| Jev, then Opus | 94.2 | $0.33 |
-| Claude Opus | 94.7 | $2.37 |
+| CRF, 218k titles | 92.2 | runs locally, needs 218k labeled titles |
+| Jev | 91.9 | $0.048 |
+| Jev, then Haiku | 92.7 | $0.055 |
+| Claude Haiku | 93.0 | $0.093 |
+| Jev, then Opus | 94.2 | $0.327 |
+| Claude Opus | 94.7 | $2.369 |
 
 There's no single best row. It depends on what a missed brand costs you. Jev is the cheapest. Haiku is a bit more accurate for about four cents more. Jev then Opus gets within half a point of Opus at a seventh of the price, though it's still more than three times the cost of Haiku, and its edge over Haiku isn't clear (its score ranged from 92.9 to 95.3 across the random splits). Jev then Haiku is no better than Haiku alone.
 
