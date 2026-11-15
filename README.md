@@ -1,4 +1,4 @@
-# Where a 2016 brand extractor slips, and how Jev does there
+# How does Jev compare to a trained CRF and Claude at extracting brands from product titles?
 
 [More (2016)](https://arxiv.org/abs/1608.04670) pulls brand names out of messy product listing titles with a CRF, a sequence-labeling model trained on labeled titles. I tried [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev), a small, fast model from TypeSafe that picks one answer from a list of options you hand it, on the same job with no training examples. Given every labeled title I had, the CRF ties Jev overall. Look at titles where the brand isn't the first thing in the title, though, and the CRF falls to 55.8 F1 while Jev scores 79.9. Claude Haiku, Anthropic's cheapest model, did about as well as Jev there, and a bit better overall, at about twice Jev's price.
 
