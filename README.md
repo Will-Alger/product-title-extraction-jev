@@ -31,7 +31,18 @@ My analysis plan listed these splits as descriptive, not as tests. For scale, th
 
 Opus scored highest on every row. It also cost $2.37 per 1,000 titles against Jev's $0.05, about 50× more, and ran about 16× slower (a median of 1.4 seconds per title against 0.09). Haiku cost $0.09 per 1,000, about twice Jev's price, and beat Jev by 1.1 points overall (95% interval 0.2 to 1.9). On titles where the brand isn't first, Haiku and Jev are within noise of each other (81.1 vs 79.9, interval for the gap -1.8 to +4.3). I didn't time Haiku.
 
-As an exploratory add-on, I let Jev answer every title and pass the ones it was least sure about to Claude. With the cutoff set to stay within half a point of Claude alone, sending about 10% to Opus scored 94.2 at $0.33 per 1,000. Sending about 6% to Haiku scored 92.7 at $0.05, which is no better than Haiku alone.
+I also tried two combinations, designed after the main comparison. Jev answers every title, and the ones it's least sure about go to Claude, with the cutoff set to stay within half a point of Claude alone. That sent about 10% of titles to Opus, or about 6% to Haiku. Here's everything side by side:
+
+| Method | F1, all titles | Cost per 1,000 titles |
+|---|---|---|
+| CRF, 218k titles | 92.2 | runs locally |
+| Jev | 91.9 | $0.05 |
+| Jev, then Haiku | 92.7 | $0.05 |
+| Claude Haiku | 93.0 | $0.09 |
+| Jev, then Opus | 94.2 | $0.33 |
+| Claude Opus | 94.7 | $2.37 |
+
+There's no single best row. It depends on what a missed brand costs you. Jev is the cheapest. Haiku is a bit more accurate for about four cents more. Jev then Opus gets within half a point of Opus at a seventh of the price, though it's still more than three times the cost of Haiku, and its edge over Haiku isn't clear (its score ranged from 92.9 to 95.3 across the random splits). Jev then Haiku is no better than Haiku alone.
 
 ## Why I think it's interesting
 
